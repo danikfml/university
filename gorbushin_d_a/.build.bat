@@ -1,2 +1,2 @@
-cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/Users/danik/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/Users/danik/university/vcpkg/scripts/buildsystems/vcpkg.cmake
 cmake --build build --config Release

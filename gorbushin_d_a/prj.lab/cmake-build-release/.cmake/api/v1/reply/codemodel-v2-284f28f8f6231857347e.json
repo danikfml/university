@@ -1,0 +1,92 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-d0094a50bb2071803777.json",
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "rational",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-rational-Release-468d2b0c7f31b438d8e1.json",
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "rational",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "arrayd",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-arrayd-Release-1b250029cd1d0cd80924.json",
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "arrayd",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2
+					],
+					"name" : "Project",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "arrayd::@996dd569006c08364848",
+					"jsonFile" : "target-arrayd-Release-890ee13d5676e90baca1.json",
+					"name" : "arrayd",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "rational::@dcd417b15b7384706043",
+					"jsonFile" : "target-rational-Release-33ee71157e0b0e26e6fc.json",
+					"name" : "rational",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/danik/university/gorbushin_d_a/prj.lab/cmake-build-release",
+		"source" : "C:/Users/danik/university/gorbushin_d_a/prj.lab"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

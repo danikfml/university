@@ -1,6 +1,8 @@
+// Copyright 2023 by Polevoy Dmitry under Free Public License 1.0.0
+
 #pragma once
-#ifndef RATIONAL_RATIONAL_HPP_20230215
-#define RATIONAL_RATIONAL_HPP_20230215
+#ifndef ARRAYD_ARRAYD_HPP_20230303
+#define ARRAYD_ARRAYD_HPP_20230303
 
 #include <iosfwd>
 #include <cstdint>
@@ -9,12 +11,12 @@ class Rational {
 public:
     Rational() = default;
     Rational(const Rational&) = default;
-    //Rational(Rational&&) = default;
-    //Rational(const int32_t num) noexcept ;
-    Rational(int32_t num, int32_t den);
+    Rational(Rational&&) = default;
+    Rational(const int32_t num) noexcept ;
+    Rational(const int32_t num, const int32_t den);
     ~Rational() = default;
     Rational& operator=(const Rational&) = default;
-    //Rational& operator=(Rational&&) = default;
+    Rational& operator=(Rational&&) = default;
 
     int32_t GetNum() const noexcept { return num_; }
     int32_t GetDen() const noexcept { return den_; }
@@ -26,7 +28,7 @@ public:
     bool operator>=(const Rational& rhs) const;
     bool operator<=(const Rational& rhs) const;
 
-    //explicit operator bool() const noexcept;
+    explicit operator bool() const noexcept;
 
     Rational& operator*=(const Rational& rhs);
 

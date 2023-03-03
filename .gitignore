@@ -31,6 +31,7 @@
 *.out
 *.app
 # CMake
+vcpkg/
 .idea/
 bin/
 build/
@@ -45,3 +46,5 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+bin.dbg/
+bin.rel/

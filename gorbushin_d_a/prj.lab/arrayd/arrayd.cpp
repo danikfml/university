@@ -1,5 +1,5 @@
 #include <iostream>
-#include "rational/rational.hpp"
+#include "arrayd/arrayd.hpp"
 
 int32_t gcd(int32_t a, int32_t b) {
     if (b > a) std::swap(a, b);
@@ -77,21 +77,19 @@ Rational& Rational::operator/=(const Rational& rhs) {
 }
 Rational Rational::operator++(int) {
     Rational tmp(*this);
-    ++* this;
+    *this += 1;
     return tmp;
 }
 Rational& Rational::operator++() {
-    this->operator+=(Rational(1, 1));
-    return *this;
+    return *this += Rational(1);
 }
 Rational Rational::operator--(int) {
     Rational tmp(*this);
-    --* this;
+    *this -= 1;
     return tmp;
 }
 Rational& Rational::operator--() {
-    this->operator-=(Rational(1, 1));
-    return *this;
+    return *this -= Rational(1);
 }
 
 bool Rational::operator==(const Rational& rhs) const { return (GetNum() == rhs.GetNum() && GetDen() == rhs.GetDen()); }
