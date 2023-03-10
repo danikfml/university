@@ -1,132 +1,74 @@
-#include <iostream>
 #include "arrayd/arrayd.hpp"
+#include <iostream>
 
-int32_t gcd(int32_t a, int32_t b) {
-    if (b > a) std::swap(a, b);
-    return b ? gcd(b, a % b) : a;
+ArrayD::ArrayD(int size_1) {
+    size = size_1;
+    data = new double[size];
 }
 
-void Rational::normalize() {
-    if (num_ < 0 && den_ < 0) { num_ *= -1; den_ *= -1; }
-    int g = gcd(std::abs(num_), std::abs(den_));
-    num_ /= g;
-    den_ /= g;
+ArrayD::ArrayD(const ArrayD &n) {
+    size = n.size;
+    data = new double[size];
+    std::copy(n.data, n.data + size, data);
 }
 
-Rational::Rational(int32_t num, int32_t den) {
-    num_ = num;
-    den_ = den;
-    if (den_ == 0) {
-        throw "Denominator can't be zero";
+ArrayD &ArrayD::operator=(const ArrayD &n) {
+    if (this == &n) {
+        return *this;
     }
-    normalize();
+    delete[] data;
+    size = n.size;
+    data = new double[size];
+    std::copy(n.data, n.data + size, data);
+    return *this;
 }
 
-Rational operator-(const Rational& rhs) {
-    return {-rhs.GetNum(), rhs.GetDen()};
+ArrayD::~ArrayD() {
+    delete[] data;
 }
-Rational& Rational::operator+=(const Rational& rhs) {
-    int32_t lmc = den_ * rhs.GetDen() / gcd(den_, rhs.GetDen());
-    num_ = lmc / den_;
-    den_ *= lmc / den_;
-    num_ += rhs.GetNum() * lmc / rhs.GetDen();
-    normalize();
-    return *this;
-}
-Rational operator+(const Rational& lhs, const Rational& rhs) {
-    /*int den = GetDen() * rhs.GetDen();
-    int num = GetNum() * rhs.GetDen() + rhs.GetNum() * GetDen();
-    return Rational(num, den);*/
-    Rational rational = lhs;
-    rational += rhs;
-    return rational;
-}
-Rational& Rational::operator-=(const Rational& rhs) {
-    this->operator+=(-rhs);
-    return *this;
-}
-Rational operator-(const Rational& lhs, const Rational& rhs) {
-    Rational rational = lhs;
-    rational -= rhs;
-    return rational;
-}
-Rational operator*(const Rational& lhs, const Rational& rhs) {
-    Rational rational = lhs;
-    rational *= rhs;
-    return rational;
-}
-Rational operator/(const Rational& lhs, const Rational& rhs) {
-    Rational rational = lhs;
-    rational /= rhs;
-    return rational;
-}
-Rational& Rational::operator*=(const Rational& rhs) {
-    this->num_ *= rhs.GetNum();
-    this->num_ *= rhs.GetDen();
-    normalize();
-    return *this;
-}
-Rational& Rational::operator/=(const Rational& rhs) {
-    if (rhs.GetNum() == 0) {
-        throw "Denominator can't be zero";
+
+double &ArrayD::operator[](int index) {
+    if (index >= size) {
+        resize(index * 2);
     }
-    this->num_ *= rhs.GetDen();
-    this->den_ *= rhs.GetNum();
-    normalize();
-    return *this;
-}
-Rational Rational::operator++(int) {
-    Rational tmp(*this);
-    *this += 1;
-    return tmp;
-}
-Rational& Rational::operator++() {
-    return *this += Rational(1);
-}
-Rational Rational::operator--(int) {
-    Rational tmp(*this);
-    *this -= 1;
-    return tmp;
-}
-Rational& Rational::operator--() {
-    return *this -= Rational(1);
+    return data[index];
 }
 
-bool Rational::operator==(const Rational& rhs) const { return (GetNum() == rhs.GetNum() && GetDen() == rhs.GetDen()); }
-bool Rational::operator!=(const Rational& rhs) const { return (GetNum() != rhs.GetNum() || GetDen() != rhs.GetDen()); }
-bool Rational::operator>=(const Rational& rhs) const { return (GetNum() * rhs.GetDen() >= rhs.GetNum() * GetDen()); }
-bool Rational::operator<=(const Rational& rhs) const { return (GetNum() * rhs.GetDen() <= rhs.GetNum() * GetDen()); }
-bool Rational::operator>(const Rational& rhs) const { return (GetNum() * rhs.GetDen() > rhs.GetNum() * GetDen()); }
-bool Rational::operator<(const Rational& rhs) const { return (GetNum() * rhs.GetDen() < rhs.GetNum() * GetDen()); }
+const double &ArrayD::operator[](int index) const {
+    return data[index];
+}
 
+int ArrayD::get_size() const {
+    return size;
+}
 
-std::istream& Rational::read_from(std::istream& istrm) {
-    int32_t numm = 0, denomm = 0;
-    char c = 0;
-    istrm >> numm >> c >> denomm;
-    if (istrm.good()) {
-        if (den_ == 0) {
-            istrm.setstate(std::ios_base::failbit);
-        }
-        if (denomm < 0 || c != '/') {
-            istrm.setstate(std::ios_base::failbit);
-        } else {
-            num_ = numm;
-            den_ = denomm;
-            normalize();
-        }
+void ArrayD::resize(int new_size) {
+    double *new_array = new double[new_size];
+    std::copy(data, data + size, new_array);
+    delete[] data;
+    data = new_array;
+    size = new_size;
+}
+
+void ArrayD::push_back(double value) {
+    if (size == 0) {
+        resize(1);
+    } else if (size == 1) {
+        resize(2);
+    } else if (size % 2 == 0) {
+        resize(size + size / 2);
+    } else {
+        resize(size + size / 2 + 1);
     }
-    return istrm;
+    data[size - 1] = value;
 }
-inline std::ostream& Rational::write_to(std::ostream& ostrm) const {
-    ostrm << GetNum() << delimiter_ << GetDen() << "\n";
-    return ostrm;
+
+void ArrayD::pop_back() {
+    if (size > 0) {
+        resize(size - 1);
+    }
 }
-std::ostream& operator<<(std::ostream& ostream, const Rational& rhs) {
-    rhs.write_to(ostream);
-    return ostream;
-}
-std::istream& operator>>(std::istream& istream, Rational& rhs) {
-    rhs.read_from(istream);
-    return istream;
+
+void ArrayD::clear() {
+    resize(0);
 }
