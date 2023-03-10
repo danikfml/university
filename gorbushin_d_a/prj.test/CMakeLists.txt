@@ -6,4 +6,3 @@ add_executable(arrayd_test arrayd_test.cpp)
 target_link_libraries(arrayd_test arrayd doctest::doctest)
 add_test(NAME arrayd_test COMMAND arrayd_test)
 
-

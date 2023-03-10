@@ -4,37 +4,27 @@
 
 #include <iosfwd>
 #include <cstdint>
+#include <numeric>
 
 class Rational {
 public:
     Rational() = default;
-    Rational(const Rational&) = default;
-    //Rational(Rational&&) = default;
-    //Rational(const int32_t num) noexcept ;
-    Rational(int32_t num, int32_t den);
+
+    Rational(const Rational& r) = default;
+
+    Rational(int64_t num, int64_t denom);
+
     ~Rational() = default;
-    Rational& operator=(const Rational&) = default;
-    //Rational& operator=(Rational&&) = default;
 
-    int32_t GetNum() const noexcept { return num_; }
-    int32_t GetDen() const noexcept { return den_; }
+    Rational& operator=(const Rational& r) = default;
 
-    bool operator==(const Rational& rhs) const;
-    bool operator!=(const Rational& rhs) const;
-    bool operator>(const Rational& rhs) const;
-    bool operator<(const Rational& rhs) const;
-    bool operator>=(const Rational& rhs) const;
-    bool operator<=(const Rational& rhs) const;
+    Rational& operator+=(const Rational& r);
 
-    //explicit operator bool() const noexcept;
+    Rational& operator-=(const Rational& r);
 
-    Rational& operator*=(const Rational& rhs);
+    Rational& operator*=(const Rational& r);
 
-    Rational& operator+=(const Rational& rhs);
-
-    Rational& operator-=(const Rational& rhs);
-
-    Rational& operator/=(const Rational& rhs);
+    Rational& operator/=(const Rational& r);
 
     Rational& operator++();
 
@@ -44,27 +34,44 @@ public:
 
     Rational operator--(int);
 
-    std::istream& read_from(std::istream& istrm);
-    std::ostream& write_to(std::ostream& ostrm) const;
+    bool operator==(const Rational& r);
+
+    bool operator!=(const Rational& r);
+
+    bool operator>(const Rational& r);
+
+    bool operator<(const Rational& r);
+
+    bool operator>=(const Rational& r);
+
+    bool operator<=(const Rational& r);
+
+    std::istream& ReadFrom(std::istream& istream);
+
+    inline std::ostream& WriteTo(std::ostream& ostream) const;
+
+    int64_t GetNum() const;
+
+    int64_t GetDenum() const;
 
 private:
-    int32_t num_ = 0;
-    int32_t den_ = 1;
-    static const char delimiter_ = '/';
-    void normalize();
+    int64_t num = 1;
+    int64_t denom = 1;
+
+    void simplify();
 };
 
-std::istream &operator>>(std::istream& istrm, Rational& rhs);
+Rational operator-(const Rational& r);
 
-std::ostream &operator<<(std::ostream& ostrm, const Rational& rhs);
+Rational operator+(const Rational& l, const Rational& r);
 
-Rational operator-(const Rational& rhs);
+Rational operator-(const Rational& l, const Rational& r);
 
-Rational operator+(const Rational& lhs, const Rational& rhs);
+Rational operator*(const Rational& l, const Rational& r);
 
-Rational operator-(const Rational& lhs, const Rational& rhs);
+Rational operator/(const Rational& l, const Rational& r);
 
-Rational operator*(const Rational& lhs, const Rational& rhs);
+std::ostream& operator<<(std::ostream& ostream, const Rational& r);
 
-Rational operator/(const Rational& lhs, const Rational& rhs);
+std::istream& operator>>(std::istream& istream, Rational& r);
 #endif
