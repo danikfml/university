@@ -38,7 +38,7 @@ const double &ArrayD::operator[](int index) const {
     return data[index];
 }
 
-int ArrayD::get_size() const {
+int ArrayD::ssize() const {
     return size;
 }
 
@@ -50,7 +50,7 @@ void ArrayD::resize(int new_size) {
     size = new_size;
 }
 
-void ArrayD::push_back(double value) {
+void ArrayD::insert(double value) {
     if (size == 0) {
         resize(1);
     } else if (size == 1) {
@@ -63,7 +63,7 @@ void ArrayD::push_back(double value) {
     data[size - 1] = value;
 }
 
-void ArrayD::pop_back() {
+void ArrayD::remove() {
     if (size > 0) {
         resize(size - 1);
     }

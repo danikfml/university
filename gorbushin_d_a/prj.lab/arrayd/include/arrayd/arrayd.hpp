@@ -15,18 +15,18 @@ public:
 
     const double &operator[](int index) const;
 
-    int get_size() const;
+    int ssize() const;
 
     void resize(int new_size);
 
-    void push_back(double value);
+    void insert(double value);
 
-    void pop_back();
+    void remove();
 
     void clear();
 
 private:
-    double *data;
+    double *data = nullptr;
     int size;
 };
 
