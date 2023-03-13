@@ -1,15 +1,15 @@
 #include <iostream>
 #include <rational/rational.hpp>
 
-Rational::Rational(int64_t num, int64_t denom) : num(num), denom(denom) {
+Rational::Rational(int64_t num, int64_t denom) : num_(num), den_(denom) {
     if (denom == 0) {
         throw std::invalid_argument("Zero division");
     }
     if (num * denom < 0) {
-        this->num = -std::abs(num);
-        this->denom = std::abs(denom);
+        this->num_ = -std::abs(num);
+        this->den_ = std::abs(denom);
     }
-    simplify();
+    normalize();
 }
 
 int64_t gcd(int64_t a, int64_t b) {
@@ -23,30 +23,28 @@ int64_t gcd(int64_t a, int64_t b) {
     return b;
 }
 
-void Rational::simplify() {
-    int64_t localGCD = denom;
-    if (num != 0) {
-        localGCD = gcd(num, denom);
+void Rational::normalize() {
+    int64_t localGCD = den_;
+    if (num_ != 0) {
+        localGCD = gcd(num_, den_);
     }
-    num /= localGCD;
-    denom /= localGCD;
+    num_ /= localGCD;
+    den_ /= localGCD;
 }
 
 Rational operator-(const Rational& r) {
-    return {-r.GetNum(), r.GetDenum()};
+    return {-r.num(), r.denom()};
 }
 
 Rational& Rational::operator+=(const Rational& r) {
-    int64_t lmc = denom * r.GetDenum() / gcd(denom, r.GetDenum());
+    int64_t lmc = den_ * r.denom() / gcd(den_, r.denom());
 
-    num *= lmc / denom;
-    denom *= lmc / denom;
+    num_ *= lmc / den_;
+    den_ *= lmc / den_;
 
-    // Почему могу обращаться к r.num, хотя он private?
-//    this->num += r.num * lmc / r.denom;
-    num += r.GetNum() * lmc / r.GetDenum();
+    num_ += r.num() * lmc / r.denom();
 
-    simplify();
+    normalize();
     return *this;
 }
 
@@ -68,9 +66,9 @@ Rational operator-(const Rational& l, const Rational& r) {
 }
 
 Rational& Rational::operator*=(const Rational& r) {
-    this->num *= r.GetNum();
-    this->denom *= r.GetDenum();
-    simplify();
+    this->num_ *= r.num();
+    this->den_ *= r.denom();
+    normalize();
     return *this;
 }
 
@@ -81,13 +79,13 @@ Rational operator*(const Rational& l, const Rational& r) {
 }
 
 Rational& Rational::operator/=(const Rational& r) {
-    if (r.GetNum() == 0) {
+    if (r.num() == 0) {
         throw std::invalid_argument("Zero division");
     }
 
-    this->num *= r.GetDenum();
-    this->denom *= r.GetNum();
-    simplify();
+    this->num_ *= r.denom();
+    this->den_ *= r.num();
+    normalize();
     return *this;
 }
 
@@ -104,7 +102,6 @@ Rational& Rational::operator++() {
 
 Rational Rational::operator++(int) {
     Rational temp(*this);
-    // do something
     ++*this;
     return temp;
 }
@@ -116,75 +113,65 @@ Rational& Rational::operator--() {
 
 Rational Rational::operator--(int) {
     Rational temp(*this);
-    // do something
     --*this;
     return temp;
 }
 
-bool Rational::operator==(const Rational& r) {
-    return this->GetNum() == r.GetNum() && this->GetDenum() == r.GetDenum();
+bool Rational::operator==(const Rational& r) const {
+    return this->num() == r.num() && this->denom() == r.denom();
 }
 
-bool Rational::operator!=(const Rational& r) {
+bool Rational::operator!=(const Rational& r) const {
     return !operator==(r);
 }
 
-bool Rational::operator>(const Rational& r) {
-    return (this->GetNum() / (double) this->GetDenum()) > (r.GetNum() / (double) r.GetDenum());
+bool Rational::operator>(const Rational& r) const {
+    return (this->num() / (double) this->denom()) > (r.num() / (double) r.denom());
 }
 
-bool Rational::operator<(const Rational& r) {
+bool Rational::operator<(const Rational& r) const {
     return !(operator>(r) || operator==(r));
 }
 
-bool Rational::operator>=(const Rational& r) {
+bool Rational::operator>=(const Rational& r) const {
     return !operator<(r);
 }
 
-bool Rational::operator<=(const Rational& r) {
+bool Rational::operator<=(const Rational& r) const {
     return !operator>(r);
 }
 
-int64_t Rational::GetNum() const {
-    return num;
-}
-
-int64_t Rational::GetDenum() const {
-    return denom;
-}
-
-std::istream& Rational::ReadFrom(std::istream& istream) {
+std::istream& Rational::read_from(std::istream& istream) {
     int64_t numI = 0;
     int64_t denomI = 0;
     char separator = 0;
     istream >> numI >> separator >> denomI;
     if (istream.good()) {
-        if (denom == 0) {
-//            throw std::invalid_argument("Zero division");
+        if (den_ == 0) {
             istream.setstate(std::ios_base::failbit);
         }
         if (denomI < 0 || separator != '/') {
             istream.setstate(std::ios_base::failbit);
         } else {
-            num = numI;
-            denom = denomI;
-            simplify();
+            num_ = numI;
+            den_ = denomI;
+            normalize();
         }
     }
     return istream;
 }
 
-inline std::ostream& Rational::WriteTo(std::ostream& ostream) const {
-    ostream << GetNum() << '/' << GetDenum() << "\n";
+inline std::ostream& Rational::write_to(std::ostream& ostream) const {
+    ostream << num() << '/' << denom() << "\n";
     return ostream;
 }
 
 std::ostream& operator<<(std::ostream& ostream, const Rational& r) {
-    r.WriteTo(ostream);
+    r.write_to(ostream);
     return ostream;
 }
 
 std::istream& operator>>(std::istream& istream, Rational& r) {
-    r.ReadFrom(istream);
+    r.read_from(istream);
     return istream;
 }

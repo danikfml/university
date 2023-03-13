@@ -34,31 +34,29 @@ public:
 
     Rational operator--(int);
 
-    bool operator==(const Rational& r);
+    bool operator==(const Rational& r) const;
 
-    bool operator!=(const Rational& r);
+    bool operator!=(const Rational& r) const;
 
-    bool operator>(const Rational& r);
+    bool operator>(const Rational& r) const;
 
-    bool operator<(const Rational& r);
+    bool operator<(const Rational& r) const;
 
-    bool operator>=(const Rational& r);
+    bool operator>=(const Rational& r) const;
 
-    bool operator<=(const Rational& r);
+    bool operator<=(const Rational& r) const;
 
-    std::istream& ReadFrom(std::istream& istream);
+    std::istream& read_from(std::istream& istream);
 
-    inline std::ostream& WriteTo(std::ostream& ostream) const;
+    inline std::ostream& write_to(std::ostream& ostream) const;
 
-    int64_t GetNum() const;
-
-    int64_t GetDenum() const;
-
+    int64_t num() const noexcept { return num_; }
+    int64_t denom() const noexcept { return den_; }
 private:
-    int64_t num = 1;
-    int64_t denom = 1;
+    int64_t num_ = 1;
+    int64_t den_ = 1;
 
-    void simplify();
+    void normalize();
 };
 
 Rational operator-(const Rational& r);

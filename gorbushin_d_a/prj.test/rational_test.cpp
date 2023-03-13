@@ -8,6 +8,7 @@ TEST_CASE("testing the Rational arithmetic") {
     Rational second = Rational(1, 17);
 
     SUBCASE("Addition") {
+//        std::cout << first + second << Rational(21, 68) << (first + second == Rational(21, 68));
         CHECK(first + second == Rational(21, 68));
         CHECK(++first == Rational(5, 4));
         CHECK(first++ == Rational(5, 4));
