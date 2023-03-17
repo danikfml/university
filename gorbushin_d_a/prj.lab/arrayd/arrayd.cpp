@@ -1,74 +1,152 @@
 #include "arrayd/arrayd.hpp"
-#include <iostream>
 
-ArrayD::ArrayD(int size_1) {
-    size = size_1;
-    data = new double[size];
+ArrayD::ArrayD()
+{
+    m_data = nullptr;
+    m_size = 0;
+    m_capacity = 0;
 }
 
-ArrayD::ArrayD(const ArrayD &n) {
-    size = n.size;
-    data = new double[size];
-    std::copy(n.data, n.data + size, data);
-}
-
-ArrayD &ArrayD::operator=(const ArrayD &n) {
-    if (this == &n) {
-        return *this;
+ArrayD::ArrayD(int size)
+{
+    if (size <= 0) {
+        throw std::invalid_argument("Invalid size");
     }
-    delete[] data;
-    size = n.size;
-    data = new double[size];
-    std::copy(n.data, n.data + size, data);
+    m_data = new double[size];
+    m_size = size;
+    m_capacity = size;
+}
+
+ArrayD::ArrayD(const ArrayD& other)
+{
+    m_data = new double[other.m_capacity];
+    m_size = other.m_size;
+    m_capacity = other.m_capacity;
+    for (int i = 0; i < m_size; ++i) {
+        m_data[i] = other.m_data[i];
+    }
+}
+
+ArrayD::~ArrayD()
+{
+    delete[] m_data;
+}
+
+int ArrayD::ssize() const
+{
+    return m_size;
+}
+
+int ArrayD::capacity() const
+{
+    return m_capacity;
+}
+
+double& ArrayD::operator[](int i)
+{
+    if (i < 0 || i >= m_size) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_data[i];
+}
+
+const double& ArrayD::operator[](int i) const
+{
+    if (i < 0 || i >= m_size) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_data[i];
+}
+
+ArrayD& ArrayD::operator=(const ArrayD& other)
+{
+    if (this != &other) {
+        double* newData = new double[other.m_capacity];
+        for (int i = 0; i < other.m_size; ++i) {
+            newData[i] = other.m_data[i];
+        }
+        delete[] m_data;
+        m_data = newData;
+        m_size = other.m_size;
+        m_capacity = other.m_capacity;
+    }
     return *this;
 }
 
-ArrayD::~ArrayD() {
-    delete[] data;
-}
-
-double &ArrayD::operator[](int index) {
-    if (index >= size) {
-        resize(index * 2);
+void ArrayD::insert(double value, int index)
+{
+    if (index < 0 || index > m_size) {
+        throw std::invalid_argument("Invalid index");
     }
-    return data[index];
-}
 
-const double &ArrayD::operator[](int index) const {
-    return data[index];
-}
-
-int ArrayD::ssize() const {
-    return size;
-}
-
-void ArrayD::resize(int new_size) {
-    double *new_array = new double[new_size];
-    std::copy(data, data + size, new_array);
-    delete[] data;
-    data = new_array;
-    size = new_size;
-}
-
-void ArrayD::insert(double value) {
-    if (size == 0) {
-        resize(1);
-    } else if (size == 1) {
-        resize(2);
-    } else if (size % 2 == 0) {
-        resize(size + size / 2);
-    } else {
-        resize(size + size / 2 + 1);
+    if (m_size == m_capacity) {
+        int newCapacity = m_capacity == 0 ? 1 : m_capacity * 2;
+        double* newData = new double[newCapacity];
+        for (int i = 0; i < index; ++i) {
+            newData[i] = m_data[i];
+        }
+        newData[index] = value;
+        for (int i = index; i < m_size; ++i) {
+            newData[i + 1] = m_data[i];
+        }
+        delete[] m_data;
+        m_data = newData;
+        m_capacity = newCapacity;
     }
-    data[size - 1] = value;
+    else {
+        for (int i = m_size; i > index; --i) {
+            m_data[i] = m_data[i - 1];
+        }
+        m_data[index] = value;
+    }
+
+    ++m_size;
 }
 
-void ArrayD::remove() {
-    if (size > 0) {
-        resize(size - 1);
+void ArrayD::remove(int index)
+{
+    if (index < 0 || index >= m_size) {
+        throw std::out_of_range("Index out of range");
+    }
+
+    for (int i = index; i < m_size - 1; ++i) {
+        m_data[i] = m_data[i + 1];
+    }
+
+    --m_size;
+
+    if (m_size * 4 <= m_capacity && m_capacity > 0) {
+        int newCapacity = m_capacity / 2;
+        double* newData = new double[newCapacity];
+        for (int i = 0; i < m_size; ++i) {
+            newData[i] = m_data[i];
+        }
+        delete[] m_data;
+        m_data = newData;
+        m_capacity = newCapacity;
     }
 }
 
-void ArrayD::clear() {
-    resize(0);
+void ArrayD::clear()
+{
+    delete[] m_data;
+    m_data = nullptr;
+    m_size = 0;
+    m_capacity = 0;
+}
+
+void ArrayD::resize(int size)
+{
+    if (size <= 0) {
+        throw std::invalid_argument("Invalid size");
+    }
+    double* newData = new double[size];
+    int n = size < m_size ? size : m_size;
+    for (int i = 0; i < n; ++i) {
+        newData[i] = m_data[i];
+    }
+    delete[] m_data;
+    m_data = newData;
+    m_size = size;
+    m_capacity = size;
 }

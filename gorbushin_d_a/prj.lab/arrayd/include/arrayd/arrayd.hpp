@@ -1,33 +1,33 @@
 #ifndef ARRAYD_HPP
 #define ARRAYD_HPP
 
-class ArrayD {
+#include <stdexcept>
+
+class ArrayD
+{
 public:
-    ArrayD(int size_1);
-
-    ArrayD(const ArrayD &n);
-
-    ArrayD &operator=(const ArrayD &n);
-
+    ArrayD();
+    ArrayD(int size);
+    ArrayD(const ArrayD& other);
     ~ArrayD();
 
-    double &operator[](int index);
-
-    const double &operator[](int index) const;
-
     int ssize() const;
+    int capacity() const;
 
-    void resize(int new_size);
+    double& operator[](int i);
+    const double& operator[](int i) const;
 
-    void insert(double value);
+    ArrayD& operator=(const ArrayD& other);
 
-    void remove();
-
+    void insert(double value, int index);
+    void remove(int index);
     void clear();
+    void resize(int size);
 
 private:
-    double *data = nullptr;
-    int size;
+    double* m_data;
+    int m_size;
+    int m_capacity;
 };
 
 #endif
