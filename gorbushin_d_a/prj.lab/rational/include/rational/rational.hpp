@@ -1,75 +1,55 @@
 #pragma once
-#ifndef RATIONAL_RATIONAL_HPP_20230215
-#define RATIONAL_RATIONAL_HPP_20230215
-
-#include <iosfwd>
+#ifndef RATIONAL_RATIONAL_HPP_20230317
+#define RATIONAL_RATIONAL_HPP_20230317
+#include <iostream>
 #include <cstdint>
-#include <numeric>
 
 class Rational {
 public:
-    Rational() = default;
+    Rational(int32_t num, int32_t denom);
+    Rational(int32_t num);
+    Rational();
+    Rational(const Rational& other);
+    Rational& operator=(const Rational& other);
+    ~Rational();
 
-    Rational(const Rational& r) = default;
-
-    Rational(int64_t num, int64_t denom);
-
-    ~Rational() = default;
-
-    Rational& operator=(const Rational& r) = default;
+    int32_t num() const noexcept;
+    int32_t denom() const noexcept;
 
     Rational& operator+=(const Rational& r);
-
     Rational& operator-=(const Rational& r);
-
     Rational& operator*=(const Rational& r);
-
     Rational& operator/=(const Rational& r);
 
     Rational& operator++();
-
     Rational operator++(int);
-
     Rational& operator--();
-
     Rational operator--(int);
 
     bool operator==(const Rational& r) const;
-
     bool operator!=(const Rational& r) const;
-
     bool operator>(const Rational& r) const;
-
     bool operator<(const Rational& r) const;
-
     bool operator>=(const Rational& r) const;
-
     bool operator<=(const Rational& r) const;
 
     std::istream& read_from(std::istream& istream);
+    std::ostream& write_to(std::ostream& ostream) const;
 
-    inline std::ostream& write_to(std::ostream& ostream) const;
-
-    int64_t num() const noexcept { return num_; }
-    int64_t denom() const noexcept { return den_; }
 private:
-    int64_t num_ = 1;
-    int64_t den_ = 1;
+    int32_t num_;
+    int32_t denom_;
 
     void normalize();
 };
 
 Rational operator-(const Rational& r);
-
 Rational operator+(const Rational& l, const Rational& r);
-
 Rational operator-(const Rational& l, const Rational& r);
-
 Rational operator*(const Rational& l, const Rational& r);
-
 Rational operator/(const Rational& l, const Rational& r);
 
 std::ostream& operator<<(std::ostream& ostream, const Rational& r);
+std::istream& operator>>(std::istream& istream, Rational& r);int32_t gcd(int32_t a, int32_t b);
 
-std::istream& operator>>(std::istream& istream, Rational& r);
 #endif
