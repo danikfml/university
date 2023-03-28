@@ -1,8 +1,13 @@
 #include "matrixs/matrixs.hpp"
 
-MatrixS::MatrixS() noexcept : m{0}, n{0}, data{nullptr} {}
+MatrixS::MatrixS(const SizeType& size) : m{std::get<0>(size)}, n{std::get<1>(size)} {
+    data = new int*[m];
+    for (std::ptrdiff_t i = 0; i < m; ++i) {
+        data[i] = new int[n]();
+    }
+}
 
-MatrixS::MatrixS(std::ptrdiff_t m, std::ptrdiff_t n) : m{m}, n{n} {
+MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n) : m{m}, n{n} {
     data = new int*[m];
     for (std::ptrdiff_t i = 0; i < m; ++i) {
         data[i] = new int[n]();
@@ -12,7 +17,7 @@ MatrixS::MatrixS(std::ptrdiff_t m, std::ptrdiff_t n) : m{m}, n{n} {
 MatrixS::MatrixS(const MatrixS& other) : m{other.m}, n{other.n} {
     data = new int*[m];
     for (std::ptrdiff_t i = 0; i < m; ++i) {
-        data[i] = new int[n];
+        data[i] = new int[n]();
         for (std::ptrdiff_t j = 0; j < n; ++j) {
             data[i][j] = other.data[i][j];
         }
@@ -29,58 +34,74 @@ MatrixS& MatrixS::operator=(const MatrixS& other) {
     return *this;
 }
 
-void MatrixS::resize(const size_type& new_size) {
-    if (new_size.first <= 0 || new_size.second <= 0) {
-        throw std::invalid_argument("Invalid size");
-    }
-
-    int** new_data = new int*[new_size.first];
-    for (std::size_t i = 0; i < new_size.first; ++i) {
-        new_data[i] = new int[new_size.second]();
-    }
-
-    for (std::ptrdiff_t i = 0; i < std::min(m, new_size.first); ++i) {
-        for (std::ptrdiff_t j = 0; j < std::min(n, new_size.second); ++j) {
-            new_data[i][j] = data[i][j];
-        }
-    }
-
+MatrixS::~MatrixS() {
     for (std::ptrdiff_t i = 0; i < m; ++i) {
         delete[] data[i];
     }
     delete[] data;
+}
 
-    m = new_size.first;
-    n = new_size.second;
+int& MatrixS::at(const SizeType& elem) {
+    return at(std::get<0>(elem), std::get<1>(elem));
+}
+
+const int& MatrixS::at(const SizeType& elem) const {
+    return at(std::get<0>(elem), std::get<1>(elem));
+}
+
+int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
+    if (i < 0 || i >= m || j < 0 || j >= n) {
+        throw std::out_of_range("Index out of range");
+    }
+    return data[i][j];
+}
+
+const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
+    if (i < 0 || i >= m || j < 0 || j >= n) {
+        throw std::out_of_range("Index out of range");
+    }
+    return data[i][j];
+}
+
+void MatrixS::resize(const SizeType& new_size) {
+    resize(std::get<0>(new_size), std::get<1>(new_size));
+}
+
+void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j) {
+    if (i <= 0 || j <= 0) {
+        throw std::invalid_argument("Invalid size");
+    }
+
+    int** new_data = new int*[i];
+    for (std::ptrdiff_t k = 0; k < i; ++k) {
+        new_data[k] = new int[j]();
+    }
+
+    for (std::ptrdiff_t k = 0; k < std::min(m, i); ++k) {
+        for (std::ptrdiff_t l = 0; l < std::min(n, j); ++l) {
+            new_data[k][l] = data[k][l];
+        }
+    }
+
+    for (std::ptrdiff_t k = 0; k < m; ++k) {
+        delete[] data[k];
+    }
+    delete[] data;
+
+    m = i;
+    n = j;
     data = new_data;
 }
 
-std::ptrdiff_t MatrixS::getRows() const noexcept {
+const MatrixS::SizeType& MatrixS::ssize() const noexcept {
+    static const SizeType size{m, n};
+    return size;
+}
+
+std::ptrdiff_t MatrixS::nRows() const noexcept {
     return m;
 }
 
-std::ptrdiff_t MatrixS::getCols() const noexcept {
+std::ptrdiff_t MatrixS::nCols() const noexcept {
     return n;
-}
-
-int* MatrixS::operator[](std::ptrdiff_t i) noexcept {
-    return data[i];
-}
-
-const int* MatrixS::operator[](std::ptrdiff_t i) const noexcept {
-    return data[i];
-}
-
-int& MatrixS::at(const size_type& pos) {
-    if (pos.first < 0 || pos.first >= m || pos.second < 0 || pos.second >= n) {
-        throw std::out_of_range("Index out of range");
-    }
-    return data[pos.first][pos.second];
-}
-
-const int& MatrixS::at(const size_type& pos) const {
-    if (pos.first < 0 || pos.first >= m || pos.second < 0 || pos.second >= n) {
-        throw std::out_of_range("Index out of range");
-    }
-    return data[pos.first][pos.second];
 }

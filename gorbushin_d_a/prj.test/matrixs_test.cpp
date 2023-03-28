@@ -2,91 +2,97 @@
 #include "matrixs/matrixs.hpp"
 #include "doctest/doctest.h"
 
-TEST_CASE("Default constructor") {
-    MatrixS m;
-    CHECK(m.getRows() == 0);
-    CHECK(m.getCols() == 0);
+TEST(MatrixSTest, DefaultConstructor) {
+    MatrixS m1;
+    ASSERT_EQ(m1.ssize(), std::make_tuple(0, 0));
 }
 
-TEST_CASE("Constructor with dimensions") {
-    MatrixS m(2, 3);
-    CHECK(m.getRows() == 2);
-    CHECK(m.getCols() == 3);
+// Test constructor with size parameter
+TEST(MatrixSTest, ConstructorWithSizeParameter) {
+    MatrixS m2(3, 2);
+    ASSERT_EQ(m2.ssize(), std::make_tuple(3, 2));
 }
 
-TEST_CASE("Copy constructor") {
-    MatrixS m1(2, 3);
-    m1[0][0] = 1;
-    m1[0][1] = 2;
-    m1[0][2] = 3;
-    m1[1][0] = 4;
-    m1[1][1] = 5;
-    m1[1][2] = 6;
-
-    MatrixS m2(m1);
-    CHECK(m2.getRows() == 2);
-    CHECK(m2.getCols() == 3);
-    CHECK(m2[0][0] == 1);
-    CHECK(m2[0][1] == 2);
-    CHECK(m2[0][2] == 3);
-    CHECK(m2[1][0] == 4);
-    CHECK(m2[1][1] == 5);
-    CHECK(m2[1][2] == 6);
+// Test copy constructor
+TEST(MatrixSTest, CopyConstructor) {
+    MatrixS m2(3, 2);
+    m2.at(1, 1) = 5;
+    MatrixS m3(m2);
+    ASSERT_EQ(m3.at(1, 1), 5);
 }
 
-TEST_CASE("Assignment operator") {
-    MatrixS m1(2, 3);
-    m1[0][0] = 1;
-    m1[0][1] = 2;
-    m1[0][2] = 3;
-    m1[1][0] = 4;
-    m1[1][1] = 5;
-    m1[1][2] = 6;
-
-    MatrixS m2;
-    m2 = m1;
-    CHECK(m2.getRows() == 2);
-    CHECK(m2.getCols() == 3);
-    CHECK(m2[0][0] == 1);
-    CHECK(m2[0][1] == 2);
-    CHECK(m2[0][2] == 3);
-    CHECK(m2[1][0] == 4);
-    CHECK(m2[1][1] == 5);
-    CHECK(m2[1][2] == 6);
+// Test assignment operator
+TEST(MatrixSTest, AssignmentOperator) {
+    MatrixS m2(3, 2);
+    m2.at(1, 1) = 5;
+    MatrixS m4;
+    m4 = m2;
+    ASSERT_EQ(m4.at(1, 1), 5);
 }
 
-TEST_CASE("Element access") {
-    MatrixS m(2, 3);
-    m[0][0] = 1;
-    m[0][1] = 2;
-    m[0][2] = 3;
-    m[1][0] = 4;
-    m[1][1] = 5;
-    m[1][2] = 6;
-
-    CHECK(m.at({0, 0}) == 1);
-    CHECK(m.at({1, 2}) == 6);
-
-    CHECK_THROWS(m.at({2, 0}));
-    CHECK_THROWS(m.at({0, 3}));
+// Test resizing matrix
+TEST(MatrixSTest, ResizeMatrix) {
+    MatrixS m2(3, 2);
+    m2.resize(2, 4);
+    ASSERT_EQ(m2.ssize(), std::make_tuple(2, 4));
 }
 
-TEST_CASE("Resize") {
-    MatrixS m(2, 3);
-    m[0][0] = 1;
-    m[0][1] = 2;
-    m[0][2] = 3;
-    m[1][0] = 4;
-    m[1][1] = 5;
-    m[1][2] = 6;
+// Test accessing elements using at() function
+TEST(MatrixSTest, AccessElementsWithAtFunction) {
+    MatrixS m2(2, 2);
+    m2.at(0, 0) = 1;
+    m2.at(0, 1) = 2;
+    m2.at(1, 0) = 3;
+    m2.at(1, 1) = 4;
+    ASSERT_EQ(m2.at(0, 0), 1);
+    ASSERT_EQ(m2.at(0, 1), 2);
+    ASSERT_EQ(m2.at(1, 0), 3);
+    ASSERT_EQ(m2.at(1, 1), 4);
+}
 
-    m.resize({3, 2});
-    CHECK(m.getRows() == 3);
-    CHECK(m.getCols() == 2);
-    CHECK(m.at({0, 0}) == 1);
-    //CHECK(m.at({1, 2}) == 0);
+// Test accessing elements using invalid indices
+TEST(MatrixSTest, AccessElementsWithInvalidIndices) {
+    MatrixS m2(2, 2);
+    bool exception_caught = false;
+    try {
+    m2.at(2, 0);
+    }
+    catch (const std::out_of_range& e) {
+    exception_caught = true;
+    }
+    ASSERT_TRUE(exception_caught);
+}
 
-    CHECK_THROWS(m.resize({-1, 2}));
-    CHECK_THROWS(m.resize({3, -1}));
+// Test accessing elements using const object
+TEST(MatrixSTest, AccessElementsWithConstObject) {
+    const MatrixS m5(2, 2);
+    ASSERT_EQ(m5.at(1, 1), 0);
+    }
+
+// Test resizing matrix with negative size
+TEST(MatrixSTest, ResizeMatrixWithNegativeSize) {
+    MatrixS m2(2, 2);
+    bool exception_caught = false;
+    try {
+    m2.resize(-1, 2);
+    }
+    catch (const std::invalid_argument& e) {
+    exception_caught = true;
+    }
+    ASSERT_TRUE(exception_caught);
+}
+
+// Test accessing elements using invalid indices after resizing
+TEST(MatrixSTest, AccessElementsWithInvalidIndicesAfterResizing) {
+    MatrixS m2(2, 2);
+    m2.resize(2, 4);
+    bool exception_caught = false;
+    try {
+    m2.at(2, 0);
+    }
+    catch (const std::out_of_range& e) {
+    exception_caught = true;
+    }
+    ASSERT_TRUE(exception_caught);
 }
 

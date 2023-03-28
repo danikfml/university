@@ -1,10 +1,11 @@
+#pragma once
 #ifndef ARRAYD_HPP
 #define ARRAYD_HPP
 
 #include <stdexcept>
+#include <algorithm>
 
-class ArrayD
-{
+class ArrayD {
 public:
     ArrayD();
     ArrayD(int size);
@@ -16,7 +17,6 @@ public:
 
     double& operator[](int i);
     const double& operator[](int i) const;
-
     ArrayD& operator=(const ArrayD& other);
 
     void insert(double value, int index);

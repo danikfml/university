@@ -3,23 +3,29 @@
 #define MATRIXS_HPP
 
 #include <cstddef>
-#include <utility>
+#include <tuple>
 #include <stdexcept>
 
 class MatrixS {
 public:
-    using size_type = std::pair<std::ptrdiff_t, std::ptrdiff_t>;
-    MatrixS() noexcept;
-    MatrixS(std::ptrdiff_t m, std::ptrdiff_t n);
+    using SizeType = std::tuple<std::ptrdiff_t, std::ptrdiff_t>;
+    MatrixS(const SizeType& size = {0, 0});
+    MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n);
     MatrixS(const MatrixS& other);
     MatrixS& operator=(const MatrixS& other);
-    void resize(const size_type& new_size);
-    std::ptrdiff_t getRows() const noexcept;
-    std::ptrdiff_t getCols() const noexcept;
-    int* operator[](std::ptrdiff_t i) noexcept;
-    const int* operator[](std::ptrdiff_t i) const noexcept;
-    int& at(const size_type& pos);
-    const int& at(const size_type& pos) const;
+    ~MatrixS();
+
+    [[nodiscard]] int& at(const SizeType& elem);
+    [[nodiscard]] const int& at(const SizeType& elem) const;
+    [[nodiscard]] int& at(const std::ptrdiff_t i, const std::ptrdiff_t j);
+    [[nodiscard]] const int& at(const std::ptrdiff_t i, const std::ptrdiff_t j) const;
+
+    void resize(const SizeType& new_size);
+    void resize(const std::ptrdiff_t i, const std::ptrdiff_t j);
+
+    [[nodiscard]] const SizeType& ssize() const noexcept;
+    [[nodiscard]] std::ptrdiff_t nRows() const noexcept;
+    [[nodiscard]] std::ptrdiff_t nCols() const noexcept;
 
 private:
     std::ptrdiff_t m;

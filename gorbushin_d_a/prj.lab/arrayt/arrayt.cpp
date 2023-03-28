@@ -1,41 +1,47 @@
-#include "arrayd/arrayd.hpp"
-
-ArrayD::ArrayD()
+#include <arrayt/arrayt.hpp>
+template <typename T>
+ArrayT<T>::ArrayT()
         : m_data(nullptr), m_size(0), m_capacity(0)
 {}
 
-ArrayD::ArrayD(int size)
-        : m_data(new double[size]), m_size(size), m_capacity(size)
+template <typename T>
+ArrayT<T>::ArrayT(int size)
+        : m_data(new T[size]), m_size(size), m_capacity(size)
 {
     if (size <= 0) {
         throw std::invalid_argument("Invalid size");
     }
 }
 
-ArrayD::ArrayD(const ArrayD& other)
-        : m_data(new double[other.m_capacity]), m_size(other.m_size), m_capacity(other.m_capacity)
+template <typename T>
+ArrayT<T>::ArrayT(const ArrayT<T>& other)
+        : m_data(new T[other.m_capacity]), m_size(other.m_size), m_capacity(other.m_capacity)
 {
     for (int i = 0; i < m_size; ++i) {
         m_data[i] = other.m_data[i];
     }
 }
 
-ArrayD::~ArrayD()
+template <typename T>
+ArrayT<T>::~ArrayT()
 {
     delete[] m_data;
 }
 
-int ArrayD::ssize() const
+template <typename T>
+int ArrayT<T>::ssize() const
 {
     return m_size;
 }
 
-int ArrayD::capacity() const
+template <typename T>
+int ArrayT<T>::capacity() const
 {
     return m_size;
 }
 
-double& ArrayD::operator[](int i)
+template <typename T>
+T& ArrayT<T>::operator[](int i)
 {
     if (i < 0 || i >= m_size) {
         throw std::out_of_range("Index out of range");
@@ -43,7 +49,8 @@ double& ArrayD::operator[](int i)
     return m_data[i];
 }
 
-const double& ArrayD::operator[](int i) const
+template <typename T>
+const T& ArrayT<T>::operator[](int i) const
 {
     if (i < 0 || i >= m_size) {
         throw std::out_of_range("Index out of range");
@@ -51,10 +58,11 @@ const double& ArrayD::operator[](int i) const
     return m_data[i];
 }
 
-ArrayD& ArrayD::operator=(const ArrayD& other)
+template <typename T>
+ArrayT<T>& ArrayT<T>::operator=(const ArrayT<T>& other)
 {
     if (this != &other) {
-        double* newData = new double[other.m_capacity];
+        T* newData = new T[other.m_capacity];
         for (int i = 0; i < other.m_size; ++i) {
             newData[i] = other.m_data[i];
         }
@@ -66,7 +74,8 @@ ArrayD& ArrayD::operator=(const ArrayD& other)
     return *this;
 }
 
-void ArrayD::insert(double value, int index)
+template <typename T>
+void ArrayT<T>::insert(T value, int index)
 {
     if (index < 0 || index >= m_size) {
         throw std::invalid_argument("Invalid index");
@@ -74,7 +83,7 @@ void ArrayD::insert(double value, int index)
 
     if (m_size == m_capacity) {
         int newCapacity = m_capacity == 0 ? 1 : m_capacity * 2;
-        double* newData = new double[newCapacity];
+        T* newData = new T[newCapacity];
         for (int i = 0; i < index; ++i) {
             newData[i] = m_data[i];
         }
@@ -96,7 +105,8 @@ void ArrayD::insert(double value, int index)
     ++m_size;
 }
 
-void ArrayD::remove(int index) {
+template <typename T>
+void ArrayT<T>::remove(int index) {
     if (m_size <= 0) {
         throw std::invalid_argument("The array is empty");
     }
@@ -109,18 +119,12 @@ void ArrayD::remove(int index) {
         m_data[i] = m_data[i + 1];
     }
 
-    m_data[m_size - 1] = 0.0;
+    m_data[m_size - 1] = 0;
     --m_size;
 }
 
-
-
-
-
-
-
-
-void ArrayD::clear()
+template <typename T>
+void ArrayT<T>::clear()
 {
     delete[] m_data;
     m_data = nullptr;
@@ -128,12 +132,13 @@ void ArrayD::clear()
     m_capacity = 0;
 }
 
-void ArrayD::resize(int size)
+template <typename T>
+void ArrayT<T>::resize(int size)
 {
     if (size <= 0) {
         throw std::invalid_argument("Invalid size");
     }
-    double* newData = new double[size];
+    T* newData = new T[size];
     int n = size < m_size ? size : m_size;
     for (int i = 0; i < n; ++i) {
         newData[i] = m_data[i];
