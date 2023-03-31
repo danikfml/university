@@ -1,34 +1,36 @@
 #pragma once
-#ifndef ARRAYT_HPP
-#define ARRAYT_HPP
 
-#include <stdexcept>
-#include <algorithm>
+#include <cstddef>
 
-template <typename T>
+template<typename T>
 class ArrayT {
 public:
     ArrayT();
-    ArrayT(int size);
-    ArrayT(const ArrayT<T>& other);
+
+    explicit ArrayT(const std::ptrdiff_t size);
+
     ~ArrayT();
 
-    int ssize() const;
-    int capacity() const;
+    ArrayT(const ArrayT &other);
 
-    T& operator[](int i);
-    const T& operator[](int i) const;
-    ArrayT<T>& operator=(const ArrayT<T>& other);
+    ArrayT &operator=(const ArrayT &other);
 
-    void insert(T value, int index);
-    void remove(int index);
-    void clear();
-    void resize(int size);
+    T &operator[](const std::ptrdiff_t i);
+
+    const T &operator[](const std::ptrdiff_t i) const;
+
+    std::ptrdiff_t ssize() const noexcept;
+
+    void resize(const std::ptrdiff_t new_size);
+
+    void insert(const std::ptrdiff_t i, const T value);
+
+    void remove(const std::ptrdiff_t i);
+
+    std::ptrdiff_t capacity() const noexcept;
 
 private:
-    T* m_data;
-    int m_size;
-    int m_capacity;
+    std::ptrdiff_t size_{0};
+    std::ptrdiff_t capacity_{0};
+    T *data_{nullptr};
 };
-
-#endif

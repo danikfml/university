@@ -1,4 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
 #include "arrayt/arrayt.hpp"
 #include "doctest/doctest.h"
 
@@ -101,8 +102,6 @@ TEST_CASE("remove") {
         REQUIRE(singleArr.ssize() == 1);
     }
 }
-
-
 
 
 TEST_CASE("ClearMethod") {

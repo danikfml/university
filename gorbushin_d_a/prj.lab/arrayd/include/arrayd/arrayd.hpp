@@ -2,32 +2,38 @@
 #ifndef ARRAYD_HPP
 #define ARRAYD_HPP
 
+#include <cstddef>
 #include <stdexcept>
-#include <algorithm>
 
 class ArrayD {
 public:
-    ArrayD();
-    ArrayD(int size);
-    ArrayD(const ArrayD& other);
+    explicit ArrayD(const std::ptrdiff_t size = 0);
+
     ~ArrayD();
 
-    int ssize() const;
-    int capacity() const;
+    ArrayD(const ArrayD &);
 
-    double& operator[](int i);
-    const double& operator[](int i) const;
-    ArrayD& operator=(const ArrayD& other);
+    ArrayD &operator=(const ArrayD &);
 
-    void insert(double value, int index);
-    void remove(int index);
-    void clear();
-    void resize(int size);
+    [[nodiscard]] double &operator[](const std::ptrdiff_t i);
+
+    [[nodiscard]] const double &operator[](const std::ptrdiff_t i) const;
+
+    [[nodiscard]] std::ptrdiff_t ssize() const noexcept;
+
+    void resize(const std::ptrdiff_t new_size);
+
+    void insert(const std::ptrdiff_t i, const double value);
+
+    void remove(const std::ptrdiff_t i);
+
+    [[nodiscard]] std::ptrdiff_t capacity() const noexcept;
 
 private:
-    double* m_data;
-    int m_size;
-    int m_capacity;
+    double *data_;
+    std::ptrdiff_t size_;
+    std::ptrdiff_t capacity_;
 };
 
 #endif
+

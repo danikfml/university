@@ -1,155 +1,100 @@
-#include <arrayt/arrayt.hpp>
-template <typename T>
-ArrayT<T>::ArrayT()
-        : m_data(nullptr), m_size(0), m_capacity(0)
-{}
+#include "arrayt/arrayt.hpp"
 
-template <typename T>
-ArrayT<T>::ArrayT(int size)
-        : m_data(new T[size]), m_size(size), m_capacity(size)
-{
-    if (size <= 0) {
-        throw std::invalid_argument("Invalid size");
+template<typename T>
+ArrayT<T>::ArrayT() = default;
+
+template<typename T>
+ArrayT<T>::ArrayT(const std::ptrdiff_t size) : size_{size}, capacity_{size}, data_{new T[capacity_]} {}
+
+template<typename T>
+ArrayT<T>::~ArrayT() {
+    delete[] data_;
+}
+
+template<typename T>
+ArrayT<T>::ArrayT(const ArrayT &other) : size_{other.size_}, capacity_{other.capacity_}, data_{new T[capacity_]} {
+    for (std::ptrdiff_t i = 0; i < size_; ++i) {
+        data_[i] = other.data_[i];
     }
 }
 
-template <typename T>
-ArrayT<T>::ArrayT(const ArrayT<T>& other)
-        : m_data(new T[other.m_capacity]), m_size(other.m_size), m_capacity(other.m_capacity)
-{
-    for (int i = 0; i < m_size; ++i) {
-        m_data[i] = other.m_data[i];
-    }
-}
-
-template <typename T>
-ArrayT<T>::~ArrayT()
-{
-    delete[] m_data;
-}
-
-template <typename T>
-int ArrayT<T>::ssize() const
-{
-    return m_size;
-}
-
-template <typename T>
-int ArrayT<T>::capacity() const
-{
-    return m_size;
-}
-
-template <typename T>
-T& ArrayT<T>::operator[](int i)
-{
-    if (i < 0 || i >= m_size) {
-        throw std::out_of_range("Index out of range");
-    }
-    return m_data[i];
-}
-
-template <typename T>
-const T& ArrayT<T>::operator[](int i) const
-{
-    if (i < 0 || i >= m_size) {
-        throw std::out_of_range("Index out of range");
-    }
-    return m_data[i];
-}
-
-template <typename T>
-ArrayT<T>& ArrayT<T>::operator=(const ArrayT<T>& other)
-{
+template<typename T>
+ArrayT<T> &ArrayT<T>::operator=(const ArrayT &other) {
     if (this != &other) {
-        T* newData = new T[other.m_capacity];
-        for (int i = 0; i < other.m_size; ++i) {
-            newData[i] = other.m_data[i];
+        if (capacity_ < other.size_) {
+            delete[] data_;
+            data_ = new T[other.capacity_];
+            capacity_ = other.capacity_;
         }
-        delete[] m_data;
-        m_data = newData;
-        m_size = other.m_size;
-        m_capacity = other.m_capacity;
+        size_ = other.size_;
+        for (std::ptrdiff_t i = 0; i < size_; ++i) {
+            data_[i] = other.data_[i];
+        }
     }
     return *this;
 }
 
-template <typename T>
-void ArrayT<T>::insert(T value, int index)
-{
-    if (index < 0 || index >= m_size) {
-        throw std::invalid_argument("Invalid index");
-    }
-
-    if (m_size == m_capacity) {
-        int newCapacity = m_capacity == 0 ? 1 : m_capacity * 2;
-        T* newData = new T[newCapacity];
-        for (int i = 0; i < index; ++i) {
-            newData[i] = m_data[i];
-        }
-        newData[index] = value;
-        for (int i = index; i < m_size; ++i) {
-            newData[i + 1] = m_data[i];
-        }
-        delete[] m_data;
-        m_data = newData;
-        m_capacity = newCapacity;
-    }
-    else {
-        for (int i = m_size; i > index; --i) {
-            m_data[i] = m_data[i - 1];
-        }
-        m_data[index] = value;
-    }
-
-    ++m_size;
+template<typename T>
+T &ArrayT<T>::operator[](const std::ptrdiff_t i) {
+    return data_[i];
 }
 
-template <typename T>
-void ArrayT<T>::remove(int index) {
-    if (m_size <= 0) {
-        throw std::invalid_argument("The array is empty");
-    }
-
-    if (index < 0 || index > m_size - 1) {
-        throw std::invalid_argument("Index out of range");
-    }
-
-    for (int i = index; i < m_size - 1; ++i) {
-        m_data[i] = m_data[i + 1];
-    }
-
-    m_data[m_size - 1] = 0;
-    --m_size;
+template<typename T>
+const T &ArrayT<T>::operator[](const std::ptrdiff_t i) const {
+    return data_[i];
 }
 
-template <typename T>
-void ArrayT<T>::clear()
-{
-    delete[] m_data;
-    m_data = nullptr;
-    m_size = 0;
-    m_capacity = 0;
+template<typename T>
+std::ptrdiff_t ArrayT<T>::ssize() const noexcept {
+    return size_;
 }
 
-template <typename T>
-void ArrayT<T>::resize(int size)
-{
-    if (size <= 0) {
-        throw std::invalid_argument("Invalid size");
+template<typename T>
+void ArrayT<T>::resize(const std::ptrdiff_t new_size) {
+    if (new_size > capacity_) {
+        T *new_data = new T[new_size];
+        for (std::ptrdiff_t i = 0; i < size_; ++i) {
+            new_data[i] = data_[i];
+        }
+        delete[] data_;
+        data_ = new_data;
+        capacity_ = new_size;
     }
-    T* newData = new T[size];
-    int n = size < m_size ? size : m_size;
-    for (int i = 0; i < n; ++i) {
-        newData[i] = m_data[i];
-    }
-    delete[] m_data;
-    m_data = newData;
-    m_size = size;
+    size_ = new_size;
+}
 
-    if (size > m_capacity / 2 && m_capacity > 0) {
-        m_capacity = size * 2;
+template<typename T>
+void ArrayT<T>::insert(const std::ptrdiff_t i, const T value) {
+    if (size_ == capacity_) {
+        T *new_data = new T[capacity_ * 2];
+        for (std::ptrdiff_t j = 0; j < i; ++j) {
+            new_data[j] = data_[j];
+        }
+        new_data[i] = value;
+        for (std::ptrdiff_t j = i + 1; j <= size_; ++j) {
+            new_data[j] = data_[j - 1];
+        }
+        delete[] data_;
+        data_ = new_data;
+        capacity_ *= 2;
     } else {
-        m_capacity = size;
+        for (std::ptrdiff_t j = size_; j > i; --j) {
+            data_[j] = data_[j - 1];
+        }
+        data_[i] = value;
     }
+    ++size_;
+}
+
+template<typename T>
+void ArrayT<T>::remove(const std::ptrdiff_t i) {
+    for (std::ptrdiff_t j = i; j < size_ - 1; ++j) {
+        data_[j] = data_[j + 1];
+    }
+    --size_;
+}
+
+template<typename T>
+std::ptrdiff_t ArrayT<T>::capacity() const noexcept {
+    return capacity_;
 }

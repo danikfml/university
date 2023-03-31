@@ -1,21 +1,21 @@
 #include "matrixs/matrixs.hpp"
 
-MatrixS::MatrixS(const SizeType& size) : m{std::get<0>(size)}, n{std::get<1>(size)} {
-    data = new int*[m];
+MatrixS::MatrixS(const SizeType &size) : m{std::get<0>(size)}, n{std::get<1>(size)} {
+    data = new int *[m];
     for (std::ptrdiff_t i = 0; i < m; ++i) {
         data[i] = new int[n]();
     }
 }
 
 MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n) : m{m}, n{n} {
-    data = new int*[m];
+    data = new int *[m];
     for (std::ptrdiff_t i = 0; i < m; ++i) {
         data[i] = new int[n]();
     }
 }
 
-MatrixS::MatrixS(const MatrixS& other) : m{other.m}, n{other.n} {
-    data = new int*[m];
+MatrixS::MatrixS(const MatrixS &other) : m{other.m}, n{other.n} {
+    data = new int *[m];
     for (std::ptrdiff_t i = 0; i < m; ++i) {
         data[i] = new int[n]();
         for (std::ptrdiff_t j = 0; j < n; ++j) {
@@ -24,7 +24,7 @@ MatrixS::MatrixS(const MatrixS& other) : m{other.m}, n{other.n} {
     }
 }
 
-MatrixS& MatrixS::operator=(const MatrixS& other) {
+MatrixS &MatrixS::operator=(const MatrixS &other) {
     if (this != &other) {
         MatrixS tmp{other};
         std::swap(m, tmp.m);
@@ -41,29 +41,29 @@ MatrixS::~MatrixS() {
     delete[] data;
 }
 
-int& MatrixS::at(const SizeType& elem) {
+int &MatrixS::at(const SizeType &elem) {
     return at(std::get<0>(elem), std::get<1>(elem));
 }
 
-const int& MatrixS::at(const SizeType& elem) const {
+const int &MatrixS::at(const SizeType &elem) const {
     return at(std::get<0>(elem), std::get<1>(elem));
 }
 
-int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
+int &MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
     if (i < 0 || i >= m || j < 0 || j >= n) {
         throw std::out_of_range("Index out of range");
     }
     return data[i][j];
 }
 
-const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
+const int &MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
     if (i < 0 || i >= m || j < 0 || j >= n) {
         throw std::out_of_range("Index out of range");
     }
     return data[i][j];
 }
 
-void MatrixS::resize(const SizeType& new_size) {
+void MatrixS::resize(const SizeType &new_size) {
     resize(std::get<0>(new_size), std::get<1>(new_size));
 }
 
@@ -72,7 +72,7 @@ void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j) {
         throw std::invalid_argument("Invalid size");
     }
 
-    int** new_data = new int*[i];
+    int **new_data = new int *[i];
     for (std::ptrdiff_t k = 0; k < i; ++k) {
         new_data[k] = new int[j]();
     }
@@ -93,7 +93,7 @@ void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j) {
     data = new_data;
 }
 
-const MatrixS::SizeType& MatrixS::ssize() const noexcept {
+const MatrixS::SizeType &MatrixS::ssize() const noexcept {
     static const SizeType size{m, n};
     return size;
 }
