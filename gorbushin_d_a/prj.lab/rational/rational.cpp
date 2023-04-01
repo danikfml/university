@@ -104,39 +104,46 @@ bool Rational::operator<=(const Rational& r) const {
 }
 
 std::istream& Rational::read_from(std::istream& istream) {
-    int32_t numI = 0;
-    int32_t denomI = 1;
-    istream >> numI;
-    if (istream.fail()) {
+    int32_t numerator = 0;
+    char del = '0';
+    int32_t denumerator = 0;
+
+    istream >> numerator;
+
+    char trash = istream.get();
+
+    if (trash == ' ') {
         istream.setstate(std::ios_base::failbit);
-        return istream;
     }
-    char delim;
-    istream >> std::ws >> delim >> std::ws;
-    if (delim != '/' && delim != '\\') {
-        istream.setstate(std::ios_base::failbit);
-        return istream;
+    else {
+
+        istream.putback(trash);
+        istream >> del;
+
+        if (del == Rational::delimiter_) {
+
+            char trash = istream.get();
+            if (trash == ' ' || trash == '-') {
+                istream.setstate(std::ios_base::failbit);
+            }
+            else {
+                istream.putback(trash);
+                num_ = numerator;
+                istream >> denumerator;
+                if (denumerator != 0) {
+                    denom_ = denumerator;
+                    normalize();
+                }
+                else {
+                    istream.setstate(std::ios_base::failbit);
+                }
+            }
+        }
+        else {
+            istream.setstate(std::ios_base::failbit);
+        }
     }
-    if (delim == '\\' && istream.peek() == '\\') {
-        istream.ignore(1);
-    }
-    istream >> denomI;
-    if (istream.fail() || denomI == 0) {
-        istream.setstate(std::ios_base::failbit);
-        return istream;
-    }
-    int sign = 1;
-    if (numI < 0) {
-        sign = -1;
-        numI = -numI;
-    }
-    if (denomI < 0) {
-        sign = -sign;
-        denomI = -denomI;
-    }
-    num_ = sign * numI;
-    denom_ = denomI;
-    normalize();
+
     return istream;
 }
 

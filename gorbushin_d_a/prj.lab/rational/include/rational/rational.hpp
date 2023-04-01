@@ -49,6 +49,7 @@ private:
 
     int32_t num_;
     int32_t denom_;
+    static const char delimiter_ = '/';
 };
 
 Rational operator-(const Rational &);
