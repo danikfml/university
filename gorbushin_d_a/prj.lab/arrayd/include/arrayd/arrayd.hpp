@@ -29,6 +29,9 @@ public:
 
     [[nodiscard]] std::ptrdiff_t capacity() const noexcept;
 
+    bool operator==(const ArrayD &other) const noexcept;
+
+
 private:
     double *data_;
     std::ptrdiff_t size_;
@@ -36,4 +39,3 @@ private:
 };
 
 #endif
-
