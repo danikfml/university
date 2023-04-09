@@ -91,8 +91,8 @@ TEST_CASE("[arrayD] - ArrayD resize") {
 TEST_CASE("[arrayd] - ArrayD push_back") {
     SUBCASE("Simple") {
         ArrayD a;
-        a.insert(1);
-        a.insert(2);
+        a.push_back(1);
+        a.push_back(2);
         CHECK(a.ssize() == 2);
         CHECK((a[0] == 1 && a[1] == 2));
         CHECK_THROWS(a[2]);
@@ -100,8 +100,8 @@ TEST_CASE("[arrayd] - ArrayD push_back") {
     }
     SUBCASE("not default") {
         ArrayD a(3);
-        a.insert(2);
-        a.insert(3);
+        a.push_back(2);
+        a.push_back(3);
         CHECK(a.ssize() == 5);
         CHECK(a == ArrayD{0, 0, 0, 2, 3});
         CHECK_THROWS(a[5]);

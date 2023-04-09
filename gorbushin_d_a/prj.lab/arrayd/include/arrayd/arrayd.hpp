@@ -1,41 +1,45 @@
 #pragma once
-#ifndef ARRAYD_HPP
-#define ARRAYD_HPP
+#ifndef ARRAYT_ARRAYT_HPP_09042023
+#define ARRAYT_ARRAYT_HPP_09042023
 
+#include <iosfwd>
+#include <initializer_list>
 #include <cstddef>
-#include <stdexcept>
 
 class ArrayD {
 public:
-    explicit ArrayD(const std::ptrdiff_t size = 0);
+    ArrayD();
+
+    ArrayD(const ArrayD &rhs);
+
+    explicit ArrayD(const std::ptrdiff_t size);
+
+    explicit ArrayD(std::initializer_list<int> lst);
 
     ~ArrayD();
 
-    ArrayD(const ArrayD &);
+    ArrayD &operator=(const ArrayD &rhs);
 
-    ArrayD &operator=(const ArrayD &);
+    int &operator[](const std::ptrdiff_t i);
 
-    [[nodiscard]] double &operator[](const std::ptrdiff_t i);
+    const int &operator[](const std::ptrdiff_t i) const;
 
-    [[nodiscard]] const double &operator[](const std::ptrdiff_t i) const;
+    void push_back(const int val);
 
-    [[nodiscard]] std::ptrdiff_t ssize() const noexcept;
+    std::ptrdiff_t ssize() const noexcept;
 
-    void resize(const std::ptrdiff_t new_size);
-
-    void insert(const std::ptrdiff_t i, const double value);
+    void insert(const std::ptrdiff_t i, const int val);
 
     void remove(const std::ptrdiff_t i);
 
-    [[nodiscard]] std::ptrdiff_t capacity() const noexcept;
+    void resize(const std::ptrdiff_t new_size);
 
-    bool operator==(const ArrayD &other) const noexcept;
-
+    bool operator==(const ArrayD &rhs) const noexcept;
 
 private:
-    double *data_;
-    std::ptrdiff_t size_;
-    std::ptrdiff_t capacity_;
+    std::ptrdiff_t size_ = 0;
+    int *data_ = nullptr;
+    std::ptrdiff_t capacity_ = 1;
 };
 
 #endif

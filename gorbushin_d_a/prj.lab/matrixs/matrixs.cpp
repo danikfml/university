@@ -1,107 +1,88 @@
 #include "matrixs/matrixs.hpp"
+#include <stdexcept>
+#include <algorithm>
 
-MatrixS::MatrixS(const SizeType &size) : m{std::get<0>(size)}, n{std::get<1>(size)} {
-    data = new int *[m];
-    for (std::ptrdiff_t i = 0; i < m; ++i) {
-        data[i] = new int[n]();
-    }
+MatrixS::MatrixS(const SizeType& size)
+        : MatrixS(std::get<0>(size), std::get<1>(size)) {}
+
+MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n)
+        : m_(m), n_(n), data_{new int[m * n]()} {}
+
+MatrixS::~MatrixS() { delete[] data_; }
+
+MatrixS::MatrixS(const MatrixS& other)
+        : m_{other.m_}, n_{other.n_}, data_{new int[m_ * n_]()} {
+    std::copy(other.data_, other.data_ + m_ * n_, data_);
 }
 
-MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n) : m{m}, n{n} {
-    data = new int *[m];
-    for (std::ptrdiff_t i = 0; i < m; ++i) {
-        data[i] = new int[n]();
-    }
-}
-
-MatrixS::MatrixS(const MatrixS &other) : m{other.m}, n{other.n} {
-    data = new int *[m];
-    for (std::ptrdiff_t i = 0; i < m; ++i) {
-        data[i] = new int[n]();
-        for (std::ptrdiff_t j = 0; j < n; ++j) {
-            data[i][j] = other.data[i][j];
-        }
-    }
-}
-
-MatrixS &MatrixS::operator=(const MatrixS &other) {
+MatrixS& MatrixS::operator=(const MatrixS& other) {
     if (this != &other) {
-        MatrixS tmp{other};
-        std::swap(m, tmp.m);
-        std::swap(n, tmp.n);
-        std::swap(data, tmp.data);
+        int* temp = new int[other.m_ * other.n_]();
+        std::copy(other.data_, other.data_ + other.m_ * other.n_, temp);
+        delete[] data_;
+        data_ = temp;
+        m_ = other.m_;
+        n_ = other.n_;
     }
     return *this;
 }
 
-MatrixS::~MatrixS() {
-    for (std::ptrdiff_t i = 0; i < m; ++i) {
-        delete[] data[i];
-    }
-    delete[] data;
-}
-
-int &MatrixS::at(const SizeType &elem) {
+int& MatrixS::at(const SizeType& elem) {
     return at(std::get<0>(elem), std::get<1>(elem));
 }
 
-const int &MatrixS::at(const SizeType &elem) const {
+const int& MatrixS::at(const SizeType& elem) const {
     return at(std::get<0>(elem), std::get<1>(elem));
 }
 
-int &MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
-    if (i < 0 || i >= m || j < 0 || j >= n) {
-        throw std::out_of_range("Index out of range");
+int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
+    if (i < 0 || i >= m_ || j < 0 || j >= n_) {
+        throw std::out_of_range("Invalid index");
     }
-    return data[i][j];
+    return data_[i * n_ + j];
 }
 
-const int &MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
-    if (i < 0 || i >= m || j < 0 || j >= n) {
-        throw std::out_of_range("Index out of range");
+const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
+    if (i < 0 || i >= m_ || j < 0 || j >= n_) {
+        throw std::out_of_range("Invalid index");
     }
-    return data[i][j];
+    return data_[i * n_ + j];
 }
 
-void MatrixS::resize(const SizeType &new_size) {
+void MatrixS::resize(const SizeType& new_size) {
     resize(std::get<0>(new_size), std::get<1>(new_size));
 }
 
 void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j) {
     if (i <= 0 || j <= 0) {
-        throw std::invalid_argument("Invalid size");
+        throw std::invalid_argument("Negative matrix size");
     }
-
-    int **new_data = new int *[i];
-    for (std::ptrdiff_t k = 0; k < i; ++k) {
-        new_data[k] = new int[j]();
+    if (i == m_ && j == n_) {
+        return;
     }
-
-    for (std::ptrdiff_t k = 0; k < std::min(m, i); ++k) {
-        for (std::ptrdiff_t l = 0; l < std::min(n, j); ++l) {
-            new_data[k][l] = data[k][l];
+    int* newData = new int[i * j]{};
+    std::ptrdiff_t min_m = (i < m_) ? i : m_;
+    std::ptrdiff_t min_n = (j < n_) ? j : n_;
+    for (std::ptrdiff_t row = 0; row < min_m; ++row) {
+        for (std::ptrdiff_t col = 0; col < min_n; ++col) {
+            newData[row * j + col] = data_[row * n_ + col];
         }
     }
-
-    for (std::ptrdiff_t k = 0; k < m; ++k) {
-        delete[] data[k];
-    }
-    delete[] data;
-
-    m = i;
-    n = j;
-    data = new_data;
+    delete[] data_;
+    data_ = newData;
+    m_ = i;
+    n_ = j;
 }
 
-const MatrixS::SizeType &MatrixS::ssize() const noexcept {
-    static const SizeType size{m, n};
+const MatrixS::SizeType& MatrixS::ssize() const noexcept {
+    static SizeType size(m_, n_);
     return size;
 }
 
 std::ptrdiff_t MatrixS::nRows() const noexcept {
-    return m;
+    return m_;
 }
 
 std::ptrdiff_t MatrixS::nCols() const noexcept {
-    return n;
+    return n_;
 }
