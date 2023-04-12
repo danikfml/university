@@ -1,88 +1,119 @@
 #include "matrixs/matrixs.hpp"
-#include <stdexcept>
-#include <algorithm>
+MatrixS::MatrixS()
+        : size_({1, 1}), data_(new int[1]())
+{}
 
 MatrixS::MatrixS(const SizeType& size)
-        : MatrixS(std::get<0>(size), std::get<1>(size)) {}
-
-MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n)
-        : m_(m), n_(n), data_{new int[m * n]()} {}
-
-MatrixS::~MatrixS() { delete[] data_; }
-
-MatrixS::MatrixS(const MatrixS& other)
-        : m_{other.m_}, n_{other.n_}, data_{new int[m_ * n_]()} {
-    std::copy(other.data_, other.data_ + m_ * n_, data_);
+        : size_(size)
+{
+    const auto [m, n] = size_;
+    if (m <= 0 || n <= 0) {
+        throw std::invalid_argument("Invalid matrix size");
+    }
+    data_ = new int[m * n]();
 }
 
-MatrixS& MatrixS::operator=(const MatrixS& other) {
-    if (this != &other) {
-        int* temp = new int[other.m_ * other.n_]();
-        std::copy(other.data_, other.data_ + other.m_ * other.n_, temp);
-        delete[] data_;
-        data_ = temp;
-        m_ = other.m_;
-        n_ = other.n_;
+MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n)
+        : MatrixS(std::make_tuple(m, n))
+{}
+
+MatrixS::~MatrixS()
+{
+    delete[] data_;
+}
+
+MatrixS::MatrixS(const MatrixS& other)
+        : size_(other.size_)
+{
+    const auto [m, n] = size_;
+    data_ = new int[m * n];
+    for (std::ptrdiff_t i = 0; i < m * n; ++i) {
+        data_[i] = other.data_[i];
     }
+}
+
+MatrixS& MatrixS::operator=(const MatrixS& other)
+{
+    if (this == &other) {
+        return *this;
+    }
+
+    const auto [m, n] = other.size_;
+    int* newData = new int[m * n]();
+    for (std::ptrdiff_t i = 0; i < m * n; ++i) {
+        newData[i] = other.data_[i];
+    }
+    delete[] data_;
+    data_ = newData;
+    size_ = other.size_;
+
     return *this;
 }
 
-int& MatrixS::at(const SizeType& elem) {
+int& MatrixS::at(const SizeType& elem)
+{
     return at(std::get<0>(elem), std::get<1>(elem));
 }
 
-const int& MatrixS::at(const SizeType& elem) const {
+const int& MatrixS::at(const SizeType& elem) const
+{
     return at(std::get<0>(elem), std::get<1>(elem));
 }
 
-int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
-    if (i < 0 || i >= m_ || j < 0 || j >= n_) {
-        throw std::out_of_range("Invalid index");
+int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j)
+{
+    const auto [m, n] = size_;
+    if (i < 0 || i >= m || j < 0 || j >= n) {
+        throw std::out_of_range("Index out of range");
     }
-    return data_[i * n_ + j];
+    return data_[i * n + j];
 }
 
-const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
-    if (i < 0 || i >= m_ || j < 0 || j >= n_) {
-        throw std::out_of_range("Invalid index");
+const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const
+{
+    const auto [m, n] = size_;
+    if (i < 0 || i >= m || j < 0 || j >= n) {
+        throw std::out_of_range("Index out of range");
     }
-    return data_[i * n_ + j];
+    return data_[i * n + j];
 }
 
-void MatrixS::resize(const SizeType& new_size) {
+void MatrixS::resize(const SizeType& new_size)
+{
     resize(std::get<0>(new_size), std::get<1>(new_size));
 }
 
-void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j) {
+void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j)
+{
     if (i <= 0 || j <= 0) {
-        throw std::invalid_argument("Negative matrix size");
+        throw std::invalid_argument("Invalid matrix size");
     }
-    if (i == m_ && j == n_) {
-        return;
-    }
-    int* newData = new int[i * j]{};
-    std::ptrdiff_t min_m = (i < m_) ? i : m_;
-    std::ptrdiff_t min_n = (j < n_) ? j : n_;
-    for (std::ptrdiff_t row = 0; row < min_m; ++row) {
-        for (std::ptrdiff_t col = 0; col < min_n; ++col) {
-            newData[row * j + col] = data_[row * n_ + col];
+
+    const auto [m, n] = size_;
+    int* newData = new int[i * j]();
+    for (std::ptrdiff_t x = 0; x < i; ++x) {
+        for (std::ptrdiff_t y = 0; y < j; ++y) {
+            if (x < m && y < n) {
+                newData[x * j + y] = data_[x * n + y];
+            }
         }
     }
     delete[] data_;
     data_ = newData;
-    m_ = i;
-    n_ = j;
+    size_ = {i, j};
 }
 
-const MatrixS::SizeType& MatrixS::ssize() const noexcept {
-    static SizeType size(m_, n_);
-    return size;
+const MatrixS::SizeType& MatrixS::ssize() const noexcept
+{
+    return size_;
 }
 
-std::ptrdiff_t MatrixS::nRows() const noexcept {
-    return m_;
+std::ptrdiff_t MatrixS::nRows() const noexcept
+{
+    return std::get<0>(size_);
 }
 
-std::ptrdiff_t MatrixS::nCols() const noexcept {
-    return n_;
+std::ptrdiff_t MatrixS::nCols() const noexcept
+{
+    return std::get<1>(size_);
 }

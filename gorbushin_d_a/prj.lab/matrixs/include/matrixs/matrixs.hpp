@@ -1,48 +1,52 @@
 #pragma once
-#ifndef MATRIXS_HPP
-#define MATRIXS_HPP
+#ifndef RATIONAL_HPP
+#define RATIONAL_HPP
 
+#include <stdexcept>
+#include <utility>
 #include <tuple>
-#include <cstddef>
 
 class MatrixS {
 public:
     using SizeType = std::tuple<std::ptrdiff_t, std::ptrdiff_t>;
 
-public:
-    explicit MatrixS(const SizeType &size = {0, 0});
-
+    MatrixS();
+    MatrixS(const SizeType& size);
     MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n);
-
     ~MatrixS();
+    MatrixS(const MatrixS& other);
+    MatrixS& operator=(const MatrixS& other);
 
-    MatrixS(const MatrixS &other);
+    int& at(const SizeType& elem);
+    const int& at(const SizeType& elem) const;
+    int& at(const std::ptrdiff_t i, const std::ptrdiff_t j);
+    const int& at(const std::ptrdiff_t i, const std::ptrdiff_t j) const;
 
-    MatrixS &operator=(const MatrixS &other);
-
-    int &at(const SizeType &elem);
-
-    const int &at(const SizeType &elem) const;
-
-    int &at(const std::ptrdiff_t i, const std::ptrdiff_t j);
-
-    const int &at(const std::ptrdiff_t i, const std::ptrdiff_t j) const;
-
-    void resize(const SizeType &new_size);
-
+    /**
+     * Изменяет размер матрицы на {new_m, new_n}.
+     * \\\\\\\\throw std::invalid_argument если new_m <= 0 или new_n <= 0
+     */
+    void resize(const SizeType& new_size);
     void resize(const std::ptrdiff_t i, const std::ptrdiff_t j);
 
-    const SizeType &ssize() const noexcept;
+    /**
+     * \\\\\\\\return текущий размер матрицы {m, n}
+     */
+    [[nodiscard]] const SizeType& ssize() const noexcept;
 
-    std::ptrdiff_t nRows() const noexcept;
+    /**
+     * \\\\\\\\return количество строк в матрице (m)
+     */
+    [[nodiscard]] std::ptrdiff_t nRows() const noexcept;
 
-    std::ptrdiff_t nCols() const noexcept;
+    /**
+     * \\\\\\\\return количество столбцов в матрице (n)
+     */
+    [[nodiscard]] std::ptrdiff_t nCols() const noexcept;
 
 private:
-    std::ptrdiff_t m_{0};
-    std::ptrdiff_t n_{0};
-    int *data_{nullptr};
+    SizeType size_;
+    int* data_;
 };
 
 #endif
-

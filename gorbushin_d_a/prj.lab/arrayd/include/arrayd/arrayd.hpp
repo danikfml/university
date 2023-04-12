@@ -1,10 +1,9 @@
 #pragma once
-#ifndef ARRAYT_ARRAYT_HPP_09042023
-#define ARRAYT_ARRAYT_HPP_09042023
+#ifndef ARRAYD_HPP
+#define ARRAYD_HPP
 
-#include <iosfwd>
-#include <initializer_list>
 #include <cstddef>
+#include <initializer_list>
 
 class ArrayD {
 public:
@@ -14,21 +13,21 @@ public:
 
     explicit ArrayD(const std::ptrdiff_t size);
 
-    explicit ArrayD(std::initializer_list<int> lst);
+    explicit ArrayD(std::initializer_list<double> lst);
 
     ~ArrayD();
 
     ArrayD &operator=(const ArrayD &rhs);
 
-    int &operator[](const std::ptrdiff_t i);
+    double &operator[](const std::ptrdiff_t i);
 
-    const int &operator[](const std::ptrdiff_t i) const;
+    const double &operator[](const std::ptrdiff_t i) const;
 
-    void push_back(const int val);
+    void push_back(const double val);
 
     std::ptrdiff_t ssize() const noexcept;
 
-    void insert(const std::ptrdiff_t i, const int val);
+    void insert(const std::ptrdiff_t i, const double val);
 
     void remove(const std::ptrdiff_t i);
 
@@ -38,7 +37,7 @@ public:
 
 private:
     std::ptrdiff_t size_ = 0;
-    int *data_ = nullptr;
+    double *data_ = nullptr;
     std::ptrdiff_t capacity_ = 1;
 };
 
