@@ -1,44 +1,57 @@
-#pragma once
 #ifndef ARRAYD_HPP
 #define ARRAYD_HPP
 
-#include <cstddef>
-#include <initializer_list>
+#include <iostream>
 
 class ArrayD {
 public:
-    ArrayD();
-
+    // Constructors
     ArrayD(const ArrayD &rhs);
 
-    explicit ArrayD(const std::ptrdiff_t size);
+    ArrayD(const ptrdiff_t &size);
 
-    explicit ArrayD(std::initializer_list<double> lst);
+    ArrayD(const std::initializer_list<double> &in_list);
 
+    // Destructor
     ~ArrayD();
 
-    ArrayD &operator=(const ArrayD &rhs);
+    // Operator Overloading
+    ArrayD &operator=(const ArrayD rhs);
 
-    double &operator[](const std::ptrdiff_t i);
+    // Member Functions
+    const ptrdiff_t ssize() const noexcept;
 
-    const double &operator[](const std::ptrdiff_t i) const;
+    void resize(const ptrdiff_t size);
 
-    void push_back(const double val);
+    bool empty() noexcept;
 
-    std::ptrdiff_t ssize() const noexcept;
+    void insert(ptrdiff_t index, double value);
 
-    void insert(const std::ptrdiff_t i, const double val);
+    void remove(ptrdiff_t index);
 
-    void remove(const std::ptrdiff_t i);
+    void push_back(const double value);
 
-    void resize(const std::ptrdiff_t new_size);
+    double pop_back();
 
-    bool operator==(const ArrayD &rhs) const noexcept;
+    void push_front(const double value);
+
+    double pop_front();
+
+    double &operator[](const ptrdiff_t index);
+
+    const double &operator[](const ptrdiff_t index) const;
+
+    bool operator==(const ArrayD &rhs) noexcept;
+
+    operator bool() const noexcept;
+
+    void fill(const int &begin, const int &end, const double &value);
 
 private:
-    std::ptrdiff_t size_ = 0;
-    double *data_ = nullptr;
-    std::ptrdiff_t capacity_ = 1;
+    double *data_{nullptr};
+    ptrdiff_t size_{0};
+    ptrdiff_t capacity_{0};
+    const double additional_memory_{0.5};
 };
 
 #endif
