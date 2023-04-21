@@ -50,7 +50,7 @@ void ArrayD::resize(const ptrdiff_t size) {
     if (size > 0) {
         if (size > capacity_) {
 
-            double *new_data = new double[size + size * additional_memory_];
+            double *new_data = new double[size + static_cast<ptrdiff_t>(size * additional_memory_)];
             std::copy(data_, data_ + size_, new_data);
             delete[] data_;
 
