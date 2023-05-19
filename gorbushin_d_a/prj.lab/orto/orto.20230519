@@ -1,12 +1,14 @@
 #include <iostream>
-#include <array>
 
 namespace geo2d::orto {
     class Point {
     public:
         Point(double x, double y) : x_(x), y_(y) {}
+
         double x() const { return x_; }
+
         double y() const { return y_; }
+
     private:
         double x_, y_;
     };
@@ -15,11 +17,17 @@ namespace geo2d::orto {
     public:
         Quadrilateral(Point p1, Point p2, Point p3, Point p4)
                 : p1_(p1), p2_(p2), p3_(p3), p4_(p4) {}
+
         Point upper_left() const;
+
         Point lower_right() const;
+
         Point upper_right() const;
+
         Point lower_left() const;
+
         double area() const;
+
     private:
         Point p1_, p2_, p3_, p4_;
     };
@@ -27,13 +35,33 @@ namespace geo2d::orto {
     class Rectangle : public Quadrilateral {
     public:
         Rectangle(Point upper_left, Point lower_right);
+
         double width() const;
+
         double height() const;
+
+        double GetW() const;
+
+        double GetH() const;
+
+        void SetW(double width);
+
+        void SetH(double height);
+
+    private:
+        double width_, height_;
     };
 
     class Square : public Rectangle {
     public:
         Square(Point upper_left, double side);
+
+        double GetS() const;
+
+        void SetS(double side);
+
+    private:
+        double side_;
     };
 
     Point Quadrilateral::upper_left() const {
@@ -70,24 +98,54 @@ namespace geo2d::orto {
             : Quadrilateral(upper_left,
                             Point(lower_right.x(), upper_left.y()),
                             lower_right,
-                            Point(upper_left.x(), lower_right.y())) {}
+                            Point(upper_left.x(), lower_right.y())) {
+        SetW(lower_right.x() - upper_left.x());
+        SetH(upper_left.y() - lower_right.y());
+    }
 
     double Rectangle::width() const {
-        return lower_right().x() - upper_left().x();
+        return GetW();
     }
 
     double Rectangle::height() const {
-        return upper_left().y() - lower_right().y();
+        return GetH();
     }
 
     Square::Square(Point upper_left, double side)
-            : Rectangle(upper_left, Point(upper_left.x() + side, upper_left.y() - side)) {}
+            : Rectangle(upper_left, Point(upper_left.x() + side, upper_left.y() - side)) {
+        SetS(side);
+    }
 
-}
+    double Square::GetS() const {
+        return side_;
+    }
+
+    void Square::SetS(double side) {
+        side_ = side;
+        SetW(side);
+        SetH(side);
+    }
+
+    double Rectangle::GetW() const {
+        return width_;
+    }
+
+    double Rectangle::GetH() const {
+        return height_;
+    }
+
+    void Rectangle::SetW(double width) {
+        width_ = width;
+    }
+
+    void Rectangle::SetH(double height) {
+        height_ = height;
+    }
 }
 
 int main() {
-    geo2d::orto::Quadrilateral quadrilateral(geo2d::orto::Point(0, 1), geo2d::orto::Point(2, 3), geo2d::orto::Point(4, 5), geo2d::orto::Point(6, 7));
+    geo2d::orto::Quadrilateral quadrilateral(geo2d::orto::Point(0, 1), geo2d::orto::Point(2, 3),
+                                             geo2d::orto::Point(4, 5), geo2d::orto::Point(6, 7));
     std::cout << "Quadrilateral area: " << quadrilateral.area() << std::endl;
 
     geo2d::orto::Rectangle rectangle(geo2d::orto::Point(0, 1), geo2d::orto::Point(2, 3));
